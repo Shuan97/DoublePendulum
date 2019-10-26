@@ -95,7 +95,7 @@ namespace DoublePendulum
 
             PointF tip1 = new PointF((float)Math.Sin(Angle1) * Length1, -(float)Math.Cos(Angle1) * Length1);
             PointF tip2 = new PointF((float)Math.Sin(Angle2) * Length2, -(float)Math.Cos(Angle2) * Length2);
-            Console.WriteLine("X1:" + tip1.X + " Y1:" + tip1.Y + " X2:" + tip2.X + " Y2:" + tip2.Y + " A1:" + Angle1 + " A2:"+ Angle2);
+            //Console.WriteLine("X1:" + tip1.X + " Y1:" + tip1.Y + " X2:" + tip2.X + " Y2:" + tip2.Y + " A1:" + Angle1 + " A2:"+ Angle2);
 
             if (tip1.X > 10000f || tip2.Y > 10000f || tip2.X > 10000f || tip2.Y > 10000f)
             {
