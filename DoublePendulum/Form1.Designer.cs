@@ -35,6 +35,7 @@
             // 
             // display
             // 
+            this.display.BackColor = System.Drawing.Color.Black;
             this.display.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.display.Dock = System.Windows.Forms.DockStyle.Fill;
             this.display.Location = new System.Drawing.Point(0, 0);

@@ -9,11 +9,16 @@ namespace DoublePendulum
 {
     public partial class Form1 : Form
     {
-        private Thread _thread;
         private readonly List<Pendulum> _pendulums;
+        private Thread _thread;      
         private Bitmap _frame;
         private Graphics g;
+        private GraphicsPath _path;
+        private PathGradientBrush _br;
+        private Rectangle _rect;
         private int _pendulumThickness = 0;
+        private float _centerX;
+        private float _centerY;
 
         private const int Interval = 5;
         private const float AnimationSpeed = 50f;
@@ -21,23 +26,11 @@ namespace DoublePendulum
         private const int EllipseDiameter = 10;       
         private const int CurveThickness = 3;
 
-
         public Form1()
         {
             InitializeComponent();
             _pendulums = new List<Pendulum>
             {
-                new Pendulum(200, 100, 250, 10, 0.5f),
-                new Pendulum(200, 100, 250, 11, 0.5f),
-                new Pendulum(200, 100, 250, 12, 0.5f),
-                new Pendulum(200, 100, 250, 13, 0.5f),
-                new Pendulum(200, 100, 250, 14, 0.5f),
-                new Pendulum(200, 100, 250, 15, 0.5f),
-                new Pendulum(200, 100, 250, 16, 0.5f),
-                new Pendulum(200, 100, 250, 17, 0.5f),
-                new Pendulum(200, 100, 250, 17, 0.5f),
-                new Pendulum(200, 100, 250, 19, 0.5f),
-
                 new Pendulum(200, 110, 250, 10, 10f),
                 new Pendulum(200, 120, 250, 11, 10f),
                 new Pendulum(200, 130, 250, 12, 10f),
@@ -48,54 +41,20 @@ namespace DoublePendulum
                 new Pendulum(200, 180, 250, 17, 10f),
                 new Pendulum(200, 190, 250, 17, 10f),
                 new Pendulum(200, 200, 250, 19, 10f),
-
-                //new Pendulum(200, 100, 250, 10, 2.5f),
-                //new Pendulum(200, 100, 250, 11, 2.5f),
-                //new Pendulum(200, 100, 250, 12, 2.5f),
-                //new Pendulum(200, 100, 250, 13, 2.5f),
-                //new Pendulum(200, 100, 250, 14, 2.5f),
-                //new Pendulum(200, 100, 250, 15, 2.5f),
-                //new Pendulum(200, 100, 250, 16, 2.5f),
-                //new Pendulum(200, 100, 250, 17, 2.5f),
-                //new Pendulum(200, 100, 250, 17, 2.5f),
-                //new Pendulum(200, 100, 250, 19, 2.5f),
-
-                //new Pendulum(120, 100, 150, 20, 1f),
-                //new Pendulum(180, 50, 500, 10, 1.5f),
-                //new Pendulum(120, 70, 180, 20, 0.5f),
-                //new Pendulum(130, 90, 120, 50, 0.7f),
-                //new Pendulum(160, 60, 200, 10, 0.5f),
-                //new Pendulum(120, 100, 3000, 10, 1f),
-                //new Pendulum(150, 50, 500, 10, 1.5f),
-                //new Pendulum(120, 70, 170, 20, 0.5f),
-                //new Pendulum(130, 90, 150, 20, 0.7f)
             };
             
             Setup();
             Start();
-
         }
 
         private void Draw()
         {
+            _centerX = display.Width / 2f;
+            _centerY = display.Height / 2f;
+            _frame = new Bitmap(display.Width, display.Height);
+            g = Graphics.FromImage(_frame);
             g.SmoothingMode = SmoothingMode.AntiAlias;
-            float centerX = display.Width / 2f;
-            float centerY = display.Height / 2f;
-
-            Rectangle rect = new Rectangle(
-                -EllipseDiameter / 2, -EllipseDiameter / 2,
-                EllipseDiameter,
-                EllipseDiameter);
-            GraphicsPath path = new GraphicsPath();
-            path.AddEllipse(rect);
-            PathGradientBrush br = new PathGradientBrush(path)
-            {               
-                CenterColor = Color.LawnGreen,
-                SurroundColors = new Color[] {Color.Transparent,}
-            };
-
-            g.Clear(Color.FromArgb(255, 0, 0, 0));
-            g.TranslateTransform(centerX, centerY);
+            g.TranslateTransform(_centerX, _centerY);
 
             foreach (Pendulum pendulum in _pendulums)
             {
@@ -117,8 +76,6 @@ namespace DoublePendulum
                     //    }
                     //}
 
-
-
                     //second curve design(fading)
                     for (int i = 1; i < pendulum.Trail.Count; i++)
                     {
@@ -131,8 +88,8 @@ namespace DoublePendulum
                         catch (Exception)
                         {
                             Console.WriteLine(@"[{0}] !!! Something goes wrong !!!", DateTime.Now);
-                            Console.WriteLine(pendulum.Trail[i-1] + " || " + list[0]);
-                            Console.WriteLine(pendulum.Trail[i] + " || " + list[1]);
+                            Console.WriteLine(pendulum.Trail[i-1] + @" || " + list[0]);
+                            Console.WriteLine(pendulum.Trail[i] + @" || " + list[1]);
                             Console.WriteLine(pendulum.Trail.Count);
                             Console.WriteLine(list.Count);
                             Console.WriteLine(Math.Abs(list[0].X - list[1].X));
@@ -143,15 +100,13 @@ namespace DoublePendulum
                     }
                 }                   
             }
-            g.ResetTransform();
-             
+            g.ResetTransform();            
 
             foreach (Pendulum pendulum in _pendulums)
             {
                 try
-                {
-                    
-                    g.TranslateTransform(centerX, centerY);                    
+                {                   
+                    g.TranslateTransform(_centerX, _centerY);                    
                     g.RotateTransform(-pendulum.Angle1 * 180 / PI);
                     g.FillRectangle(pendulum.Brush1, new Rectangle(-_pendulumThickness / 2, 0 / 2, _pendulumThickness, pendulum.Length1));
                     g.TranslateTransform(0, pendulum.Length1);
@@ -159,22 +114,20 @@ namespace DoublePendulum
                     g.RotateTransform((pendulum.Angle1 - pendulum.Angle2) * 180 / PI);                    
                     g.FillRectangle(pendulum.Brush2, new Rectangle(-_pendulumThickness / 2, 0 / 2, _pendulumThickness, pendulum.Length2));
                     g.TranslateTransform(0, pendulum.Length2);                    
-                    g.FillEllipse(br, rect);
+                    g.FillEllipse(_br, _rect);
                     g.ResetTransform();
                 }
                 catch (Exception)
                 {
                     Console.WriteLine(@"[{0}] Some graphics translations goes wrong!", DateTime.Now);
-                    Console.WriteLine(pendulum.Angle1 + "  ||  " + pendulum.Angle2);
-                }
-                
+                    Console.WriteLine(pendulum.Angle1 + @"  ||  " + pendulum.Angle2);
+                }               
             }
-
             g.Flush();
 
             try
             {
-                display.Invoke(new Action(() => display.Image = _frame));
+                display.Invoke(new Action(() => display.Image = _frame));                
             }
             catch (Exception)
             {               
@@ -183,15 +136,24 @@ namespace DoublePendulum
         }
 
         private void Setup()
-        {        
+        {
+            //variables, objects setup          
+            _rect = new Rectangle(-EllipseDiameter / 2, -EllipseDiameter / 2,EllipseDiameter,EllipseDiameter);
+            _path = new GraphicsPath();
+            _path.AddEllipse(_rect);
+            _br = new PathGradientBrush(_path)
+            {
+                CenterColor = Color.LawnGreen,
+                SurroundColors = new Color[] { Color.Transparent, }
+            };
+            
+            //running pendulum thread
             _thread = new Thread(() =>
             {
                 while (true)
                 {
-                    _frame = new Bitmap(this.Width, this.Height);
-                    g = Graphics.FromImage(_frame);
                     UpdateSimulation(AnimationSpeed / 1000f);
-                    Draw();
+                    Draw();                   
                     Thread.Sleep(Interval);
                 }
             });

@@ -27,9 +27,7 @@ namespace DoublePendulum
         public Brush Brush1 { get; set; }
         public Brush Brush2 { get; set; }
         public Brush Brush3 { get; set; }
-        public LinearGradientBrush GradientBrush1 { get; set; }
-        public PathGradientBrush GradientBrush2 { get; set; }
-
+        
         public int TrailLength { get; set; }
 
         private const float G = 9.8f; //Earth gravity
@@ -56,15 +54,9 @@ namespace DoublePendulum
             this.Brush1 = Brushes.LawnGreen;
             this.Brush2 = Brushes.ForestGreen;
             this.Brush3 = Brushes.Aqua;
-            this.GradientBrush1 = new LinearGradientBrush(
-                new Point(-320, -320),
-                new Point(320, 320),
-                Color.FromArgb(255, 255, 0, 0),
-                Color.FromArgb(255, 0, 0, 255));
-
+           
             this.TrailLength = 50;
             this.Trail = new List<PointF>(this.TrailLength + 1);
-
         }
 
         public void Update(float dt)
@@ -90,33 +82,18 @@ namespace DoublePendulum
             Angle1 += Velocity1 * dt;
             Angle2 += Velocity2 * dt;
 
+            //in case pendulum start rotating infinitely in one direction
             Angle1 = Angle1 % Pi; // range (-PI;PI) 2 radians
             Angle2 = Angle2 % Pi; // range (-PI;PI) 2 radians
 
             PointF tip1 = new PointF((float)Math.Sin(Angle1) * Length1, -(float)Math.Cos(Angle1) * Length1);
             PointF tip2 = new PointF((float)Math.Sin(Angle2) * Length2, -(float)Math.Cos(Angle2) * Length2);
+            this.Add(new PointF(tip1.X + tip2.X, -tip1.Y - tip2.Y));
             //Console.WriteLine("X1:" + tip1.X + " Y1:" + tip1.Y + " X2:" + tip2.X + " Y2:" + tip2.Y + " A1:" + Angle1 + " A2:"+ Angle2);
-
-            if (tip1.X > 10000f || tip2.Y > 10000f || tip2.X > 10000f || tip2.Y > 10000f)
-            {
-                Console.WriteLine("Poza zakresem!");
-                Console.WriteLine("Length1: " + Length1);
-                Console.WriteLine("Length2: " + Length1);
-                Console.WriteLine((float)Math.Sin(Angle1));
-                Console.WriteLine((float)Math.Sin(Angle2));
-                Console.WriteLine(Angle1);
-                Console.WriteLine(Angle2);
-            }
-            else
-            {
-                this.Add(new PointF(tip1.X + tip2.X, -tip1.Y - tip2.Y));
-            }
-            
         }
 
         private void Add(PointF point)
-        {            
- 
+        {           
             Trail.Add(point);
             if (TrailLength > 0 && Trail.Count > TrailLength)
             {
