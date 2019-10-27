@@ -31,7 +31,7 @@ namespace DoublePendulum
         public int TrailLength { get; set; }
 
         private const float G = 9.8f; //Earth gravity
-        private const float Pi = (float)(Math.PI * 2); //2 radians
+        private const float Pi = (float)(Math.PI);
 
         public List<PointF> Trail { get; private set; }
 
@@ -43,7 +43,7 @@ namespace DoublePendulum
             this.Mass1 = mass1;
             this.Mass2 = mass2;
 
-            this.Angle1 = angle*Pi/4;
+            this.Angle1 = -Pi/2 + angle;
             this.Velocity1 = 0f;
             this.Acceleration1 = 0f;
 
@@ -83,8 +83,8 @@ namespace DoublePendulum
             Angle2 += Velocity2 * dt;
 
             //in case pendulum start rotating infinitely in one direction
-            Angle1 = Angle1 % Pi; // range (-PI;PI) 2 radians
-            Angle2 = Angle2 % Pi; // range (-PI;PI) 2 radians
+            Angle1 = Angle1 % (Pi * 2); // range (-PI;PI) 2 radians
+            Angle2 = Angle2 % (Pi * 2); // range (-PI;PI) 2 radians
 
             PointF tip1 = new PointF((float)Math.Sin(Angle1) * Length1, -(float)Math.Cos(Angle1) * Length1);
             PointF tip2 = new PointF((float)Math.Sin(Angle2) * Length2, -(float)Math.Cos(Angle2) * Length2);

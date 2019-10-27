@@ -10,6 +10,7 @@ namespace DoublePendulum
     public partial class Form1 : Form
     {
         private readonly List<Pendulum> _pendulums;
+        private readonly List<Pendulum> _pendulumsTemp;
         private Thread _thread;      
         private Bitmap _frame;
         private Graphics g;
@@ -42,7 +43,7 @@ namespace DoublePendulum
                 new Pendulum(200, 190, 250, 17, 10f),
                 new Pendulum(200, 200, 250, 19, 10f),
             };
-            
+            _pendulumsTemp = new List<Pendulum>();
             Setup();
             Start();
         }
@@ -52,9 +53,20 @@ namespace DoublePendulum
             _centerX = display.Width / 2f;
             _centerY = display.Height / 2f;
             _frame = new Bitmap(display.Width, display.Height);
+            //_frame.
             g = Graphics.FromImage(_frame);
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.TranslateTransform(_centerX, _centerY);
+
+            if (_pendulumsTemp.Count > 0)
+            {
+                _pendulums.Add(_pendulumsTemp[0]);
+                _pendulumsTemp.RemoveAt(0);
+            }
+
+            if (_pendulums.Count >= 10)
+                _pendulums.RemoveAt(0);
+
 
             foreach (Pendulum pendulum in _pendulums)
             {
@@ -182,6 +194,32 @@ namespace DoublePendulum
             this._pendulumThickness = this._pendulumThickness == 0
                 ? this._pendulumThickness = 1
                 : this._pendulumThickness = 0;
+        }
+
+        private static float Distance(PointF p1, PointF p2)
+        {
+            return (float)Math.Sqrt(Math.Pow((p2.X - p1.X), 2) + Math.Pow((p2.Y - p1.Y), 2));
+        }
+
+        private static float Angle(PointF p1, PointF p2, PointF p3)
+        {
+            float a = Distance(p1, p2);
+            float b = Distance(p1, p3);
+            float c = Distance(p2, p3);
+            return (a * a + b * b - c * c) / (2 * a * b);
+        }
+
+        private void AddPendulumMouseClick(object sender, MouseEventArgs e)
+        {
+            PointF pointOne = new PointF(_centerX, _centerY);
+            PointF pointTwo = new PointF(0, _centerY);
+            PointF pointThree = new PointF(e.X, e.Y);
+            int length = (int)Distance(pointOne, pointThree);
+            float angle = (float)Math.Acos(Angle(pointOne, pointTwo, pointThree));
+            if (e.Y < _centerY)            
+                angle = -angle;
+                       
+            _pendulumsTemp.Add(new Pendulum(length, 100, 2, 2, angle));
         }
     }
 }

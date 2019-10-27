@@ -44,6 +44,7 @@
             this.display.Size = new System.Drawing.Size(884, 761);
             this.display.TabIndex = 0;
             this.display.TabStop = false;
+            this.display.MouseClick += new System.Windows.Forms.MouseEventHandler(this.AddPendulumMouseClick);
             // 
             // btnArms
             // 
